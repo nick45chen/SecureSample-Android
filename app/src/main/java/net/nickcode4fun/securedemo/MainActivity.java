@@ -1,5 +1,6 @@
 package net.nickcode4fun.securedemo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import java.security.cert.CertificateException;
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOCAL_STORAGE_FILE_NAME = "Fugle";
+    private static final String CHARSET = "ISO8859-1";
     private BiometricWrapper biometricWrapper;
     private ActivityMainBinding viewBinding;
     private KeyStore keyStore;
@@ -37,31 +39,17 @@ public class MainActivity extends AppCompatActivity {
         initKeystore();
         biometricWrapper = new BiometricWrapper(this);
         updateDeviceInfoView();
-        try {
-            if (!localStorage.containsKey("AES"))
-                localStorage.put("AES", new String(keyUtil.generateAESKey(), "ISO8859-1"));
-            if (!localStorage.containsKey("IV"))
-                localStorage.put("IV", new String(keyUtil.generateIV(), "ISO8859-1"));
-            byte[] aeskey = localStorage.get("AES", "").toString().getBytes("ISO8859-1");
-            byte[] iv = localStorage.get("IV", "").toString().getBytes("ISO8859-1");
-            Log.d(getClass().getName(), "#### AES key: " + new String(aeskey, "ISO8859-1"));
-            Log.d(getClass().getName(), "#### IV: " + new String(iv, "ISO8859-1"));
-            Log.d(getClass().getName(), "#### plainText: 哈哈哈哈哈");
-            byte[] encryptionAES = keyUtil.encryptAES("哈哈哈哈哈".getBytes(), aeskey, iv);
-            Log.d(getClass().getName(), "#### AES 加密: " + new String(encryptionAES, "ISO8859-1"));
-            Log.d(getClass().getName(), "#### AES 解密: " + new String(keyUtil.decryptAES(encryptionAES, aeskey, iv)));
-            ///
-            Log.d(getClass().getName(), "################");
+        updateKeystoreInfoView();
+    }
 
-            String encryption = keyUtil.encryptRSA("哈哈哈哈哈".getBytes());
-            Log.d(getClass().getName(), "#### 測試開始");
-            Log.d(getClass().getName(), "#### plainText: " + "哈哈哈哈哈");
-            Log.d(getClass().getName(), "#### RSA 加密: " + encryption);
-            Log.d(getClass().getName(), "#### RSA 解密: " + new String(keyUtil.decryptRSA(encryption)));
-        } catch (Exception e) {
+    @SuppressLint("SetTextI18n")
+    private void updateKeystoreInfoView() {
+        try {
+            viewBinding.txtAesSupport.setText("AES: " + (localStorage.containsKey("AES") ? "ON" : "OFF"));
+            viewBinding.txtRsaSupport.setText("RSA: " + (keyStore.containsAlias(KeyUtil.KEYSTORE_ALIAS) ? "ON" : "OFF"));
+        } catch (KeyStoreException e) {
             e.printStackTrace();
         }
-
     }
 
     private void updateDeviceInfoView() {
@@ -85,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
             keyStore = KeyStore.getInstance(KeyUtil.KEYSTORE_PROVIDER);
             keyStore.load(null);
             keyUtil = new KeyUtil(keyStore);
+            // RSA
             if (!keyStore.containsAlias(KeyUtil.KEYSTORE_ALIAS)) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                     keyUtil.generateRSAKey();
@@ -95,8 +84,57 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Log.d(getClass().getName(), "#### Already have RSA key. alias: " + KeyUtil.KEYSTORE_ALIAS);
             }
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
+            // AES
+            if (!localStorage.containsKey("AES")) {
+                byte[] aesKey = keyUtil.generateAESKey();
+                String encryption = keyUtil.encryptRSA(aesKey);
+                localStorage.put("AES", encryption);
+            }
+            if (!localStorage.containsKey("IV")) {
+                byte[] iv =keyUtil.generateIV();
+                String encryption = keyUtil.encryptRSA(iv);
+                localStorage.put("IV", encryption);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @SuppressWarnings("unused")
+    private void test() {
+        try {
+            // AES
+            if (!localStorage.containsKey("AES")) {
+                byte[] aesKey = keyUtil.generateAESKey();
+                String encryption = keyUtil.encryptRSA(aesKey);
+                localStorage.put("AES", encryption);
+            }
+            if (!localStorage.containsKey("IV")) {
+                byte[] iv =keyUtil.generateIV();
+                String encryption = keyUtil.encryptRSA(iv);
+                localStorage.put("IV", encryption);
+            }
+            byte[] aesKey = keyUtil.decryptRSA(localStorage.get("AES", ""));
+            byte[] iv = keyUtil.decryptRSA(localStorage.get("IV", ""));
+
+            Log.d(getClass().getName(), "#### AES key: " + new String(aesKey, CHARSET));
+            Log.d(getClass().getName(), "#### IV: " + new String(iv, CHARSET));
+            Log.d(getClass().getName(), "#### plainText: 哈哈哈哈哈");
+            byte[] encryptionAES = keyUtil.encryptAES("哈哈哈哈哈".getBytes(), aesKey, iv);
+            Log.d(getClass().getName(), "#### AES 加密: " + new String(encryptionAES, CHARSET));
+            Log.d(getClass().getName(), "#### AES 解密: " + new String(keyUtil.decryptAES(encryptionAES, aesKey, iv)));
+            ///
+            Log.d(getClass().getName(), "################");
+
+            String encryption = keyUtil.encryptRSA("哈哈哈哈哈".getBytes());
+            Log.d(getClass().getName(), "#### 測試開始");
+            Log.d(getClass().getName(), "#### plainText: " + "哈哈哈哈哈");
+            Log.d(getClass().getName(), "#### RSA 加密: " + encryption);
+            Log.d(getClass().getName(), "#### RSA 解密: " + new String(keyUtil.decryptRSA(encryption)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

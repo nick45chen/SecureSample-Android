@@ -6,6 +6,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="vertical"
         tools:context=".MainActivity">
 
@@ -24,7 +26,8 @@
                 android:layout_marginStart="10dp"
                 android:text="KeyStore支援"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="HardcodedText" />
 
             <View
                 android:layout_width="1dp"
@@ -73,12 +76,89 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_margin="10dp"
-            android:hint="要加密的內容" />
+            android:hint="要加密的內容"
+            tools:ignore="HardcodedText" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#d5d5d5" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/edit_decryption"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_margin="10dp"
+            android:hint="要解密的內容"
+            tools:ignore="HardcodedText" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#d5d5d5" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_encrypt_rsa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RSA加密"
+            tools:ignore="HardcodedText" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_decrypt_rsa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RSA解密"
+            tools:ignore="HardcodedText" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_encrypt_aes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AES加密"
+            tools:ignore="HardcodedText" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_decrypt_aes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AES解密"
+            tools:ignore="HardcodedText" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_info_outline" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txt_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="長按視窗可以複製文字內容"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/txt_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/black"
+            android:minHeight="100dp"
+            android:padding="10dp"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:lineHeight="18dp"
+            tools:text="內容內容內容" />
 
 
     </LinearLayout>
