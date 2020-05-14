@@ -14,6 +14,9 @@ import java.util.concurrent.Executor;
 import static android.content.ContentValues.TAG;
 
 public class BiometricUtil {
+
+
+
     public BiometricPrompt createBiometricPrompt(FragmentActivity context) {
         Executor executor = ContextCompat.getMainExecutor(context);
         BiometricPrompt.AuthenticationCallback callback = new BiometricPrompt.AuthenticationCallback() {
@@ -46,7 +49,8 @@ public class BiometricUtil {
                 // Authenticate without requiring the user to press a "confirm"
                 // button after satisfying the biometric check
                 .setConfirmationRequired(false)
-                .setNegativeButtonText("關閉")
+                //.setNegativeButtonText("關閉")
+                .setDeviceCredentialAllowed(true) // 可以使用屏幕鎖或密碼方式，跟 Negative Button 不可一起使用
                 .build();
     }
 }

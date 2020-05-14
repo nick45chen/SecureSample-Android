@@ -36,7 +36,7 @@ import javax.security.auth.x500.X500Principal;
 
 public class KeyUtil {
 
-    private static final String AES_ALGORITHM = "AES";
+    private static final String AES_ALGORITHM = "AES"; // KeyProperties
     private static final String AES_CIPHER_MODE = "AES/CBC/PKCS5Padding"; //algorithm/mode/padding
     public static final String KEYSTORE_ALIAS = "FugleAPPKey";
     public static final String KEYSTORE_PROVIDER = "AndroidKeyStore";

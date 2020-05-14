@@ -13,9 +13,27 @@ public class BiometricWrapper {
 
     public BiometricWrapper(Context context) {
         this.context = context;
-        biometricManager = biometricManager = BiometricManager.from(context);
+        biometricManager = BiometricManager.from(context);
     }
 
+    /**
+     * 硬體是否支援
+     */
+    public boolean isHardwareDetected() {
+        return biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ||
+                biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE;
+    }
+
+    /**
+     * 是否支援指紋辨識
+     * */
+    public boolean isSupportFingerprint() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_FINGERPRINT);
+    }
+
+    /**
+     * 是否有生物驗證可以使用
+     * */
     public boolean canAuthenticate() {
         switch (biometricManager.canAuthenticate()) {
             case BiometricManager.BIOMETRIC_SUCCESS:
@@ -34,10 +52,4 @@ public class BiometricWrapper {
                 return false;
         }
     }
-
-    public boolean isSupportFingerprint() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_FINGERPRINT);
-    }
-
-
 }

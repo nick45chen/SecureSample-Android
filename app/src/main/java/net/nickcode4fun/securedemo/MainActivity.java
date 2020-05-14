@@ -76,8 +76,9 @@ public class MainActivity extends AppCompatActivity {
                 BiometricPrompt.PromptInfo promptInfo = biometricUtil.createPromptInfo();
                 if (BiometricManager.from(this).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
                     try {
-                        biometricPrompt.authenticate(promptInfo, new BiometricPrompt.CryptoObject(keyUtil.getCipher()));
-                    } catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | NoSuchPaddingException | InvalidKeyException e) {
+                        //biometricPrompt.authenticate(promptInfo, new BiometricPrompt.CryptoObject(keyUtil.getCipher()));
+                        biometricPrompt.authenticate(promptInfo);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -205,12 +206,12 @@ public class MainActivity extends AppCompatActivity {
     private String getDeviceInfo(Context context) {
         String deviceName = Build.MANUFACTURER + " " + Build.MODEL + " " + Build.VERSION.RELEASE;
         String softwareVersionName = Build.VERSION_CODES.class.getFields()[android.os.Build.VERSION.SDK_INT].getName();
-        boolean supportBiometric = biometricWrapper.canAuthenticate();
+        boolean supportBiometric = biometricWrapper.isHardwareDetected();
         boolean supportFingerprint = biometricWrapper.isSupportFingerprint();
         return "版本資訊\n" +
                 "手機: " + deviceName + "\n" +
                 "軟體版本: " + softwareVersionName + "\n" +
-                "是否支援指紋辨識: " + supportBiometric + "\n" +
+                "是否支援生物辨識: " + supportBiometric + "\n" +
                 "是否支援指紋辨識: " + supportFingerprint;
     }
 
