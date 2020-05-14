@@ -8,19 +8,30 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
 import androidx.databinding.DataBindingUtil;
 
+import net.nickcode4fun.lib_biometric.BiometricUtil;
 import net.nickcode4fun.lib_local_storage.BaseSharedPreferences;
 import net.nickcode4fun.securedemo.biometric.BiometricWrapper;
 import net.nickcode4fun.securedemo.databinding.ActivityMainBinding;
 
+import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+
+import javax.crypto.NoSuchPaddingException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,6 +57,34 @@ public class MainActivity extends AppCompatActivity {
         setUpAESEncryptBtn();
         setUpAESDecryptBtn();
         setUpTextContentClick();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.btn_bio_auth: {
+                // 生物辨識登入
+                BiometricUtil biometricUtil = new BiometricUtil();
+                BiometricPrompt biometricPrompt = biometricUtil.createBiometricPrompt(this);
+                BiometricPrompt.PromptInfo promptInfo = biometricUtil.createPromptInfo();
+                if (BiometricManager.from(this).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
+                    try {
+                        biometricPrompt.authenticate(promptInfo, new BiometricPrompt.CryptoObject(keyUtil.getCipher()));
+                    } catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | NoSuchPaddingException | InvalidKeyException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setUpTextContentClick() {

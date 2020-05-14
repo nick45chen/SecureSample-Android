@@ -38,4 +38,6 @@ public class BiometricWrapper {
     public boolean isSupportFingerprint() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_FINGERPRINT);
     }
+
+
 }

@@ -12,17 +12,22 @@ import androidx.annotation.RequiresApi;
 
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.UnrecoverableKeyException;
 import java.util.Calendar;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -39,9 +44,33 @@ public class KeyUtil {
     private static final String RSA_CIPHER_MODE = "RSA/ECB/PKCS1Padding";
 
     private KeyStore keyStore;
+    private Signature signature;
 
     public KeyUtil(KeyStore keyStore) {
         this.keyStore = keyStore;
+    }
+
+    public Signature getSignature() {
+        if (signature == null) {
+            try {
+                signature = Signature.getInstance("SHA256withRSA");
+                PublicKey publicKey = keyStore.getCertificate(KEYSTORE_ALIAS).getPublicKey();
+                PrivateKey key = (PrivateKey) keyStore.getKey(KEYSTORE_ALIAS, null);
+                signature.initSign(key);
+                signature.initVerify(publicKey);
+            } catch (Exception e) {
+               e.printStackTrace();
+            }
+        }
+        return signature;
+    }
+
+    public Cipher getCipher() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, NoSuchPaddingException, InvalidKeyException {
+        PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEYSTORE_ALIAS, null);
+
+        Cipher cipher = Cipher.getInstance(RSA_CIPHER_MODE);
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        return cipher;
     }
 
     public byte[] generateAESKey() {
@@ -104,8 +133,8 @@ public class KeyUtil {
                 .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512) //Set of digests algorithms with which the key can be used
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
                 .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
-                .setUserAuthenticationRequired(false) //Sets whether this key is authorized to be used only if the user has been authenticated, default false
-                .setUserAuthenticationValidityDurationSeconds(60)  //Duration(seconds) for which this key is authorized to be used after the user is successfully authenticated
+                .setUserAuthenticationRequired(true) //Sets whether this key is authorized to be used only if the user has been authenticated, default false
+                //.setUserAuthenticationValidityDurationSeconds(60)  //Duration(seconds) for which this key is authorized to be used after the user is successfully authenticated
                 .setKeySize(2048) // RSA default key size is 2048
                 .build();
         keyPairGenerator.initialize(spec);

@@ -1,3 +1,4 @@
 rootProject.name='SecureDemo'
 include ':app'
 include ':lib_local_storage'
+include ':lib_biometric'
